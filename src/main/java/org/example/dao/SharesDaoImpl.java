@@ -10,7 +10,11 @@ import org.example.model.SharesType;
 public class SharesDaoImpl implements SharesDao {
     @Override
     public void setValue(Integer price, Shares element) {
-        SharesStorage.shares.put(price, element);
+        if (element.getSize() == 0 && SharesStorage.shares.containsKey(price)) {
+            SharesStorage.shares.remove(price);
+        } else {
+            SharesStorage.shares.put(price, element);
+        }
     }
 
     @Override
