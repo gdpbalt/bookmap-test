@@ -8,7 +8,6 @@ import org.example.model.Shares;
 import org.example.model.SharesType;
 
 public class SharesDaoImpl implements SharesDao {
-
     @Override
     public void setValue(Integer price, Shares element) {
         SharesStorage.shares.put(price, element);

@@ -8,7 +8,6 @@ import java.util.List;
 import org.example.service.WriterService;
 
 public class WriterServiceImpl implements WriterService {
-
     @Override
     public void write(String fileName, List<String> report) {
         try {

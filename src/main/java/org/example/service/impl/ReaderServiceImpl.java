@@ -7,7 +7,6 @@ import java.util.List;
 import org.example.service.ReaderService;
 
 public class ReaderServiceImpl implements ReaderService {
-
     @Override
     public List<String> read(String fileName) {
         try {

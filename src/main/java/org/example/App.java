@@ -19,7 +19,7 @@ import org.example.strategy.action.OrderHandler;
 import org.example.strategy.action.QueryHandler;
 import org.example.strategy.action.UpdateHandler;
 
-public class Main {
+public class App {
     public static final String INPUT_FILE_NAME = "input.txt";
     public static final String OUTPUT_FILE_NAME = "output.txt";
 
