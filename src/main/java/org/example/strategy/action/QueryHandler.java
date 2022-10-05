@@ -1,9 +1,9 @@
 package org.example.strategy.action;
 
-import java.util.Optional;
 import org.example.dao.SharesDao;
 import org.example.exception.InputValidationException;
 import org.example.exception.InvalidCommandCastException;
+import org.example.exception.OperationUnknownException;
 import org.example.model.CommandBase;
 import org.example.model.CommandQuery;
 import org.example.model.Cost;
@@ -19,14 +19,15 @@ public class QueryHandler implements ActionHandler {
         //noinspection EnhancedSwitchMigration
         switch (commandQuery.getType()) {
             case BEST_BID:
-                Optional<Cost> maxCost = sharesDao.getMaxPriceAndNotZeroSizeByType(SharesType.BID);
-                return maxCost.isPresent() ? convertCost2String(maxCost.get()) : "";
+                return convertCost2String(sharesDao.getMaxPriceAndNotZeroSizeByType(SharesType.BID)
+                        .orElseThrow(() -> new OperationUnknownException(
+                                "Not found the best BEST_BID price")));
             case BEST_ASK:
-                Optional<Cost> minCost = sharesDao.getMinPriceAndNotZeroSizeByType(SharesType.ASK);
-                return minCost.isPresent() ? convertCost2String(minCost.get()) : "";
+                return convertCost2String(sharesDao.getMinPriceAndNotZeroSizeByType(SharesType.ASK)
+                        .orElseThrow(() -> new OperationUnknownException(
+                                "Not found the best BEST_ASK price")));
             case SIZE:
-                Optional<Integer> size = sharesDao.getSizeByPrice(commandQuery.getPrice());
-                return size.isPresent() ? convertSize2String(size.get()) : "";
+                return convertSize2String(sharesDao.getSizeByPrice(commandQuery.getPrice()));
             default:
                 throw new InputValidationException("Unknown command " + commandQuery.getType());
         }

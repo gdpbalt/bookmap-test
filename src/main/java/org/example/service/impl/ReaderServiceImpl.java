@@ -12,8 +12,7 @@ public class ReaderServiceImpl implements ReaderService {
         try {
             return Files.readAllLines(Path.of(fileName));
         } catch (IOException e) {
-            throw new RuntimeException(
-                    String.format("Error read data from file '%s'", fileName), e);
+            throw new RuntimeException("Error read data from file " + fileName, e);
         }
     }
 }

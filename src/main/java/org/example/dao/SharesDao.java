@@ -14,5 +14,5 @@ public interface SharesDao {
 
     Optional<Cost> getMaxPriceAndNotZeroSizeByType(SharesType type);
 
-    Optional<Integer> getSizeByPrice(Integer price);
+    Integer getSizeByPrice(Integer price);
 }

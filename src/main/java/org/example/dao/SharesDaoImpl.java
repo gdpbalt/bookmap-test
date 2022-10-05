@@ -40,10 +40,10 @@ public class SharesDaoImpl implements SharesDao {
     }
 
     @Override
-    public Optional<Integer> getSizeByPrice(Integer price) {
+    public Integer getSizeByPrice(Integer price) {
         if (SharesStorage.shares.containsKey(price)) {
-            return Optional.of(SharesStorage.shares.get(price).getSize());
+            return SharesStorage.shares.get(price).getSize();
         }
-        return Optional.empty();
+        return 0;
     }
 }

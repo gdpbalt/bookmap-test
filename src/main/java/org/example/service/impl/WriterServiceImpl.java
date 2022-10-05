@@ -13,8 +13,7 @@ public class WriterServiceImpl implements WriterService {
         try {
             Files.write(Path.of(fileName), report, Charset.defaultCharset());
         } catch (IOException e) {
-            throw new RuntimeException(
-                    String.format("Error write report to file '%s'", fileName), e);
+            throw new RuntimeException("Error write report to file " + fileName, e);
         }
     }
 }

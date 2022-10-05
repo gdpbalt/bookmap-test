@@ -1,6 +1,5 @@
 package org.example.strategy.action;
 
-import java.util.Optional;
 import org.example.dao.SharesDao;
 import org.example.exception.InvalidCommandCastException;
 import org.example.exception.OperationUnknownException;
@@ -17,25 +16,37 @@ public class OrderHandler implements ActionHandler {
             throw new InvalidCommandCastException("Error cast to CommandOrder class");
         }
         CommandOrder commandOrder = (CommandOrder) command;
-        Optional<Cost> cost;
-        //noinspection EnhancedSwitchMigration
-        switch (commandOrder.getType()) {
-            case BUY:
-                cost = sharesDao.getMinPriceAndNotZeroSizeByType(SharesType.ASK);
-                break;
-            case SELL:
-                cost = sharesDao.getMaxPriceAndNotZeroSizeByType(SharesType.BID);
-                break;
-            default:
-                throw new OperationUnknownException("Unknown command update type: "
-                        + commandOrder.getType());
+        int size = commandOrder.getSize();
+        while (size > 0) {
+            Cost cost;
+            //noinspection EnhancedSwitchMigration
+            switch (commandOrder.getType()) {
+                case BUY:
+                    cost = sharesDao.getMinPriceAndNotZeroSizeByType(SharesType.ASK)
+                            .orElseThrow(() -> new OperationUnknownException(
+                                    "Not found the best price for BUY"));
+                    break;
+                case SELL:
+                    cost = sharesDao.getMaxPriceAndNotZeroSizeByType(SharesType.BID)
+                            .orElseThrow(() -> new OperationUnknownException(
+                                    "Not found the best price for SELL"));
+                    break;
+                default:
+                    throw new OperationUnknownException("Unknown command update type: "
+                            + commandOrder.getType());
+            }
+            int diff;
+            if (size > cost.getSize()) {
+                diff = cost.getSize();
+                size -= diff;
+            } else {
+                diff = size;
+                size = 0;
+            }
+            Shares shares = sharesDao.getValue(cost.getPrice());
+            shares.setSize(shares.getSize() - diff);
+            sharesDao.setValue(cost.getPrice(), shares);
         }
-        if (cost.isEmpty() || cost.get().getSize() < commandOrder.getSize()) {
-            throw new OperationUnknownException("In result we will get negative size");
-        }
-        Shares shares = sharesDao.getValue(cost.get().getPrice());
-        shares.setSize(shares.getSize() - commandOrder.getSize());
-        sharesDao.setValue(cost.get().getPrice(), shares);
         return "";
     }
 }
