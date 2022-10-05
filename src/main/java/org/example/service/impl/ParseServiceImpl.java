@@ -6,8 +6,8 @@ import org.example.exception.InputValidationException;
 import org.example.model.CommandBase;
 import org.example.model.CommandOrder;
 import org.example.model.CommandQuery;
-import org.example.model.OperationType;
 import org.example.model.CommandUpdate;
+import org.example.model.OperationType;
 import org.example.service.ParseService;
 
 public class ParseServiceImpl implements ParseService {
@@ -36,11 +36,17 @@ public class ParseServiceImpl implements ParseService {
 
     private CommandBase strategyCreate(OperationType command, String[] fields) {
         try {
-            return switch (command) {
-                case UPDATE -> CommandUpdate.of(command, fields);
-                case QUERY -> CommandQuery.of(command, fields);
-                case ORDER -> CommandOrder.of(command, fields);
-            };
+            //noinspection EnhancedSwitchMigration
+            switch (command) {
+                case UPDATE:
+                    return CommandUpdate.of(command, fields);
+                case QUERY:
+                    return CommandQuery.of(command, fields);
+                case ORDER:
+                    return CommandOrder.of(command, fields);
+                default:
+                    throw new InputValidationException("Unknown command " + command);
+            }
         } catch (RuntimeException e) {
             throw new InputValidationException("Something go wrong. " + e);
         }

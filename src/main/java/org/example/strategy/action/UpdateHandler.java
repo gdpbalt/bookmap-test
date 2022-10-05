@@ -1,7 +1,6 @@
 package org.example.strategy.action;
 
 import org.example.dao.SharesDao;
-import org.example.exception.InputValidationException;
 import org.example.exception.InvalidCommandCastException;
 import org.example.exception.OperationUnknownException;
 import org.example.model.CommandBase;
@@ -17,6 +16,7 @@ public class UpdateHandler implements ActionHandler {
         }
         CommandUpdate commandUpdate = (CommandUpdate) command;
         SharesType sharesType;
+        //noinspection EnhancedSwitchMigration
         switch (commandUpdate.getType()) {
             case BID:
                 sharesType = SharesType.BID;
@@ -25,8 +25,8 @@ public class UpdateHandler implements ActionHandler {
                 sharesType = SharesType.ASK;
                 break;
             default:
-                throw new OperationUnknownException("Unknown command update type: " +
-                        commandUpdate.getType());
+                throw new OperationUnknownException("Unknown command update type: "
+                        + commandUpdate.getType());
         }
         sharesDao.setValue(commandUpdate.getPrice(),
                 new Shares(commandUpdate.getSize(), sharesType));

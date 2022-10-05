@@ -1,14 +1,18 @@
 package org.example.dao;
 
+import java.util.Optional;
+import org.example.model.Cost;
 import org.example.model.Shares;
 import org.example.model.SharesType;
 
 public interface SharesDao {
     void setValue(Integer price, Shares element);
 
-    String getMinPriceAndNotZeroSizeByType(SharesType type);
+    Shares getValue(Integer price);
 
-    String getMaxPriceAndNotZeroSizeByType(SharesType type);
+    Optional<Cost> getMinPriceAndNotZeroSizeByType(SharesType type);
 
-    String getByPrice(Integer price);
+    Optional<Cost> getMaxPriceAndNotZeroSizeByType(SharesType type);
+
+    Optional<Integer> getSizeByPrice(Integer price);
 }

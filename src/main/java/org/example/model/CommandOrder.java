@@ -11,7 +11,7 @@ public class CommandOrder extends CommandBase {
     static {
         SUBCOMMANDS = Map.of(
                 "buy", CommandOrderType.BUY,
-                "sell", CommandOrderType.BUY);
+                "sell", CommandOrderType.SELL);
     }
 
     private final CommandOrderType type;
