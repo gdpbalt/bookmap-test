@@ -1,14 +1,18 @@
 package org.example;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import org.example.dao.SharesDao;
 import org.example.dao.SharesDaoImpl;
 import org.example.model.CommandBase;
 import org.example.model.OperationType;
+import org.example.service.ParseService;
+import org.example.service.WriterService;
 import org.example.service.impl.ParseServiceImpl;
-import org.example.service.impl.ReaderServiceImpl;
 import org.example.service.impl.WriterServiceImpl;
 import org.example.strategy.ActionStrategy;
 import org.example.strategy.ActionStrategyImpl;
@@ -22,22 +26,34 @@ public class App {
     public static final String OUTPUT_FILE_NAME = "output.txt";
 
     public static void main(String[] args) {
-        List<String> outputList = new ArrayList<>();
+        Path outputPath = Path.of(OUTPUT_FILE_NAME);
+        try {
+            Files.deleteIfExists(outputPath);
+            Files.createFile(outputPath);
+        } catch (IOException e) {
+            throw new RuntimeException("Error create output file " + OUTPUT_FILE_NAME, e);
+        }
+        WriterService writerService = new WriterServiceImpl(outputPath);
+
         SharesDao sharesDao = new SharesDaoImpl();
+        ParseService parseService = new ParseServiceImpl();
         ActionStrategy actionStrategy = new ActionStrategyImpl(
                 Map.of(OperationType.UPDATE, new UpdateHandler(),
                         OperationType.QUERY, new QueryHandler(),
                         OperationType.ORDER, new OrderHandler()));
 
-        List<String> inputList = new ReaderServiceImpl().read(INPUT_FILE_NAME);
-        List<CommandBase> parsedList = new ParseServiceImpl().parse(inputList);
-        for (CommandBase record : parsedList) {
-            ActionHandler actionHandler = actionStrategy.get(record.getOperation());
-            String result = actionHandler.process(sharesDao, record);
-            if (!result.isEmpty()) {
-                outputList.add(result);
+        try (BufferedReader reader = new BufferedReader(new FileReader(INPUT_FILE_NAME))) {
+            String inputLine;
+            while ((inputLine = reader.readLine()) != null) {
+                if (inputLine.isEmpty()) {
+                    continue;
+                }
+                CommandBase parsedData = parseService.parse(inputLine);
+                ActionHandler actionHandler = actionStrategy.get(parsedData.getOperation());
+                writerService.write(actionHandler.process(sharesDao, parsedData));
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Error read data from file " + INPUT_FILE_NAME, e);
         }
-        new WriterServiceImpl().write(OUTPUT_FILE_NAME, outputList);
     }
 }

@@ -1,7 +1,6 @@
 package org.example.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.regex.Pattern;
 import org.example.exception.InputValidationException;
 import org.example.model.CommandBase;
 import org.example.model.CommandOrder;
@@ -12,19 +11,12 @@ import org.example.service.ParseService;
 
 public class ParseServiceImpl implements ParseService {
     private static final int OPERATION_INDEX = 0;
+    private final Pattern splitPattern = Pattern.compile("\\s*,\\s*");
 
     @Override
-    public List<CommandBase> parse(List<String> data) {
-        List<CommandBase> outputList = new ArrayList<>();
-        for (String record : data) {
-            if (record.isEmpty()) {
-                continue;
-            }
-            String[] fields = record.trim().split("\\s*,\\s*");
-            OperationType operation = getOperation(fields[OPERATION_INDEX]);
-            outputList.add(strategyCreate(operation, fields));
-        }
-        return outputList;
+    public CommandBase parse(String data) {
+        String[] fields = splitPattern.split(data);
+        return commandFactory(getOperation(fields[OPERATION_INDEX]), fields);
     }
 
     private OperationType getOperation(String command) {
@@ -34,7 +26,7 @@ public class ParseServiceImpl implements ParseService {
         throw new InputValidationException("Can't find known command in input record");
     }
 
-    private CommandBase strategyCreate(OperationType command, String[] fields) {
+    private CommandBase commandFactory(OperationType command, String[] fields) {
         try {
             //noinspection EnhancedSwitchMigration
             switch (command) {
